@@ -14,7 +14,7 @@ Source0:        https://registry.npmjs.org/websocket/-/websocket-1.0.8.tgz
 BuildArch:      noarch
 ExclusiveArch:  %{ix86} x86_64 %{arm} noarch
 
-BuildRequires:  nodejs-devel
+BuildRequires:  nodejs-devel node-gyp
 
 %description
 This is a (mostly) pure JavaScript implementation of the WebSocket 
@@ -25,14 +25,17 @@ protocol versions 8 and 13 for Node.
 
 
 %build
-#nothing to do
+make
 
 
 %install
 rm -rf %{buildroot}
 
+node install
+
+
 mkdir -p %{buildroot}%{nodejs_sitelib}/websocket
-cp -pr lib src vendor package.json LICENSE README.md Makefile index.js install.js %{buildroot}%{nodejs_sitelib}/websocket
+cp -rp package.json index.js lib build vendor LICENSE README.md CHANGELOG.md %{buildroot}%{nodejs_sitelib}/websocket
 
 %nodejs_symlink_deps
 
@@ -43,6 +46,8 @@ rm -rf %{buildroot}
 %files
 %defattr(-,root,root,-)
 %{nodejs_sitelib}/websocket
+%{_prefix}/lib/debug
+%{_prefix}/src
 
 
 %changelog

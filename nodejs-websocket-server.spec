@@ -42,6 +42,7 @@ rm -rf %{buildroot}
 %files
 %defattr(-,root,root,-)
 %{nodejs_sitelib}/websocket-server
+%doc %{nodejs_sitelib}/websocket-server/docs
 
 
 %changelog
