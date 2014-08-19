@@ -2,7 +2,7 @@
 
 Name:           nodejs-cube
 Version:        0.2.12
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Cube is a system for collecting timestamped events and deriving metrics.
 
 Group:          Node
@@ -25,6 +25,13 @@ and histograms of arbitrary event sets. Cube is built on MongoDB and
 available under the Apache License.
 
 Want to learn more? See the wiki.
+
+%package collectd
+Summary:        Collectd configuration for posting events to cube
+Requires:       collectd
+
+%description collectd
+Collectd configuration for posting events to cube
 
 %prep
 %setup -q -n package
@@ -51,7 +58,7 @@ patch -p0 <<EOF
 -    cube = require("../"),
 +#!/usr/bin/env node
 +
-+var options = require("/etc/cube/collector-config"),
++var options = require("%{_sysconfdir}/cube/collector-config"),
 +    cube = require("cube"),
      server = cube.server(options);
  
@@ -64,7 +71,7 @@ diff -ruN bin.orig/evaluator.js bin/evaluator.js
 -    cube = require("../"),
 +#!/usr/bin/env node
 +
-+var options = require("/etc/cube/evaluator-config"),
++var options = require("%{_sysconfdir}/cube/evaluator-config"),
 +    cube = require("cube"),
      server = cube.server(options);
  
@@ -89,7 +96,7 @@ patch -p0 <<EOF
        primary = http.createServer(),
        secondary = websprocket.createServer(),
 -      file = new static.Server("static"),
-+      file = new static.Server("/usr/lib/node_modules/cube/static"),
++      file = new static.Server("%{nodejs_sitelib}/cube/static"),
        meta,
        endpoints = {ws: [], http: []},
        id = 0;
@@ -139,8 +146,21 @@ patch <<EOF
      "websocket-server": "1.4.04"
 EOF
 
+cat > collectd.conf <<EOF
+LoadPlugin logfile
+<Plugin logfile>
+	LogLevel info
+	File "/var/log/collectd.log"
+	Timestamp true
+</Plugin>
 
-
+LoadPlugin write_http
+<Plugin write_http>
+	<URL "http://localhost:1080/collectd">
+		Format "JSON"
+	</URL>
+</Plugin>
+EOF
 
 %build
 make 
@@ -160,6 +180,9 @@ mkdir -p %{buildroot}%{_bindir}
 ln -sf %{nodejs_sitelib}/cube/bin/collector.js %{buildroot}%{_bindir}/cube-collector
 ln -sf %{nodejs_sitelib}/cube/bin/evaluator.js %{buildroot}%{_bindir}/cube-evaluator
 
+#collectd
+install -D collectd.conf %{buildroot}%{_sysconfdir}/collectd.d/cube.conf
+
 
 %nodejs_symlink_deps
 
@@ -174,7 +197,12 @@ rm -rf %{buildroot}
 %{_bindir}/cube-collector
 %{_bindir}/cube-evaluator
 
+%files collectd
+%config %_sysconfdir/collectd.d/cube.conf
+
 
 %changelog
+* Mon Aug 19 2014 Daniel Spinozzi <dspinoz@gmail.com> - 0.2.12-2
+- optional package for posting collectd events to cube
 * Mon Aug 11 2014 Daniel Spinozzi <dspinoz@gmail.com> - 0.2.12-1
 - packaged for installation on redhat using epel nodejs
