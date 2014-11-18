@@ -3,7 +3,14 @@
 
 set -e
 
-for f in *.spec
+FILES=( $* )
+
+if [ ${#FILES[@]} -eq 0 ]
+then
+  FILES='*.spec'
+fi
+
+for f in $FILES
 do
 
   rpmbuild \
