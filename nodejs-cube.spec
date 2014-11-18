@@ -146,19 +146,20 @@ patch <<EOF
      "websocket-server": "1.4.04"
 EOF
 
-
+# Event Subtyping
+# Allow event types with dot notation ('.') to define sub-types
+# Events are stored with main type (up to first dot), and then data field
+# is modified to include sub type(s) 
+# https://github.com/square/cube/pull/80
 patch -p0 <<EOF
 diff -ruN cube-0.2.12-orig/lib/cube/event.js cube-0.2.12/lib/cube/event.js
---- lib.orig/cube/event.js	2013-08-20 11:13:26.000000000 +0930
-+++ lib/cube/event.js	2014-11-18 20:22:30.000000000 +1030
-@@ -33,7 +33,18 @@
+--- cube-0.2.12-orig/lib/cube/event.js	2013-08-20 11:13:26.000000000 +0930
++++ cube-0.2.12/lib/cube/event.js	2014-11-19 06:13:52.000000000 +1030
+@@ -33,7 +33,15 @@
          type = request.type;
  
      // Validate the date and type.
 -    if (!type_re.test(type)) return callback({error: "invalid type"}), -1;
-+    
-+    // Event Subtyping
-+    // https://github.com/square/cube/pull/80
 +    var keys = type.split('.');
 +    keys.forEach(function(t) {
 +      if (!type_re.test(t)) {
@@ -171,7 +172,7 @@ diff -ruN cube-0.2.12-orig/lib/cube/event.js cube-0.2.12/lib/cube/event.js
      if (isNaN(time)) return callback({error: "invalid time"}), -1;
  
      // If an id is specified, promote it to Mongo's primary key.
-@@ -41,7 +52,7 @@
+@@ -41,7 +49,7 @@
      if ("id" in request) event._id = request.id;
  
      // If this is a known event type, save immediately.
@@ -180,7 +181,7 @@ diff -ruN cube-0.2.12-orig/lib/cube/event.js cube-0.2.12/lib/cube/event.js
  
      // If someone is already creating the event collection for this new type,
      // then append this event to the queue for later save.
-@@ -77,7 +88,7 @@
+@@ -77,7 +85,7 @@
        // Save any pending events to the new collection.
        function saveEvents() {
          knownByType[type] = true;
@@ -189,7 +190,7 @@ diff -ruN cube-0.2.12-orig/lib/cube/event.js cube-0.2.12/lib/cube/event.js
          delete eventsToSaveByType[type];
        }
      });
-@@ -91,8 +102,15 @@
+@@ -91,8 +99,32 @@
    // delay between saving the event and invalidating the metrics reduces the
    // likelihood of a race condition between when the events are read by the
    // evaluator and when the newly-computed metrics are saved.
@@ -199,8 +200,25 @@ diff -ruN cube-0.2.12-orig/lib/cube/event.js cube-0.2.12/lib/cube/event.js
 +    if (event._id !== undefined) {
 +      var updater = {t: event.t};
 +      updater[key !== '' ? 'd.' + key : 'd'] = event.d;
-+      collection(type).events.update({_id: event._id}, {\$set: updater}, {safe: true, upsert: true}, handle);
++      collection(type).events.update({_id: event._id}, {$set: updater}, {safe: true, upsert: true}, handle);
 +    } else {
++
++      if (key !== '') {
++        // Convert sub-keys into event.d properties
++        var d = event.d;
++        delete event.d;
++
++        var prev = event['d'] = {};
++
++        var keys = key.split('.').forEach(function(k) {
++          prev = prev[ k ] = {};
++        });
++
++        Object.keys(d).forEach(function(p) {
++          prev[p] = d[p];
++        });
++      }
++      
 +      collection(type).events.save(event, handle);
 +    }
 +    
