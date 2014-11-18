@@ -153,8 +153,8 @@ EOF
 # https://github.com/square/cube/pull/80
 patch -p0 <<EOF
 diff -ruN cube-0.2.12-orig/lib/cube/event.js cube-0.2.12/lib/cube/event.js
---- cube-0.2.12-orig/lib/cube/event.js	2013-08-20 11:13:26.000000000 +0930
-+++ cube-0.2.12/lib/cube/event.js	2014-11-19 06:13:52.000000000 +1030
+--- lib.orig/cube/event.js	2013-08-20 11:13:26.000000000 +0930
++++ lib/cube/event.js	2014-11-19 06:13:52.000000000 +1030
 @@ -33,7 +33,15 @@
          type = request.type;
  
