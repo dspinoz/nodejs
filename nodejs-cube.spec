@@ -200,7 +200,7 @@ diff -ruN cube-0.2.12-orig/lib/cube/event.js cube-0.2.12/lib/cube/event.js
 +    if (event._id !== undefined) {
 +      var updater = {t: event.t};
 +      updater[key !== '' ? 'd.' + key : 'd'] = event.d;
-+      collection(type).events.update({_id: event._id}, {$set: updater}, {safe: true, upsert: true}, handle);
++      collection(type).events.update({_id: event._id}, {\$set: updater}, {safe: true, upsert: true}, handle);
 +    } else {
 +
 +      if (key !== '') {
