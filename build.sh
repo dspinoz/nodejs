@@ -3,6 +3,7 @@
 
 set -e
 
+# TODO must build files in the correct order
 FILES=( $* )
 
 if [ ${#FILES[@]} -eq 0 ]
