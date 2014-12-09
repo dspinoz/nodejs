@@ -285,7 +285,7 @@ rm -rf %{buildroot}
 %changelog
 * Tue Nov 18 2014 Daniel Spinozzi <dspinoz@gmail.com> - 0.2.12-3
 - Add pull request #86 to allow event subtyping
-* Mon Aug 19 2014 Daniel Spinozzi <dspinoz@gmail.com> - 0.2.12-2
+* Tue Aug 19 2014 Daniel Spinozzi <dspinoz@gmail.com> - 0.2.12-2
 - optional package for posting collectd events to cube
 * Mon Aug 11 2014 Daniel Spinozzi <dspinoz@gmail.com> - 0.2.12-1
 - packaged for installation on redhat using epel nodejs

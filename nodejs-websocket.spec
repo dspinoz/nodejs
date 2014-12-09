@@ -11,10 +11,9 @@ License:        Apache License Version 2.0
 URL:            https://www.npmjs.org/package/websocket
 Source0:        https://registry.npmjs.org/websocket/-/websocket-1.0.8.tgz
 
-BuildArch:      noarch
 ExclusiveArch:  %{ix86} x86_64 %{arm} noarch
 
-BuildRequires:  nodejs-devel node-gyp
+BuildRequires:  nodejs-devel node-gyp make
 
 %description
 This is a (mostly) pure JavaScript implementation of the WebSocket 
@@ -51,5 +50,5 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Mon Aug 14 2014 Daniel Spinozzi <dspinoz@gmail.com> - 0.6.5-1
+* Thu Aug 14 2014 Daniel Spinozzi <dspinoz@gmail.com> - 0.6.5-1
 - packaged for installation on redhat using epel nodejs
