@@ -1,20 +1,20 @@
 %{?nodejs_find_provides_and_requires}
 
-Name:           nodejs-queue-async
-Version:        1.0.7
+Name:           nodejs-statsd
+Version:        0.7.2
 Release:        1%{?dist}
-Summary:        A little helper for asynchronous JavaScript
+Summary:        Simple daemon for easy stats aggregation
 
 Group:          Node
 License:        Free
 
-URL:            http://github.com/mbostock/queue
-Source0:        https://registry.npmjs.org/queue-async/-/queue-async-1.0.7.tgz
+URL:            http://github.com/etsy/statsd
+Source0:        https://registry.npmjs.org/statsd/-/statsd-0.7.2.tgz
 
 BuildArch:      noarch
 ExclusiveArch:  %{ix86} x86_64 %{arm} noarch
 
-BuildRequires:  nodejs-devel
+BuildRequires:  nodejs-devel nodeunit nodejs-temp nodejs-underscore
 
 %description
 
@@ -23,24 +23,24 @@ BuildRequires:  nodejs-devel
 
 %build
 #nothing to do
+./run_tests.sh
 
 
 %install
 rm -rf %{buildroot}
 
-mkdir -p %{buildroot}%{nodejs_sitelib}/queue-async
-cp -pr src package.json LICENSE README.md component.json Makefile queue.js queue.min.js %{buildroot}%{nodejs_sitelib}/queue-async
+mkdir -p %{buildroot}%{nodejs_sitelib}/statsd
+cp -pr .travis.yml .npmignore * %{buildroot}%{nodejs_sitelib}/statsd
 
 %nodejs_symlink_deps
 
 %clean
 rm -rf %{buildroot}
 
-
 %files
 %defattr(-,root,root,-)
-%{nodejs_sitelib}/queue-async
+%{nodejs_sitelib}/statsd
 
 %changelog
-* Wed Dec 10 2014 Daniel Spinozzi <dspinoz@gmail.com> - 1.0.7-1
+* Thu Dec 18 2014 Daniel Spinozzi <dspinoz@gmail.com> - 0.7.2-1
 - packaged for installation on redhat using epel nodejs
