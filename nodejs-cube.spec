@@ -150,7 +150,7 @@ EOF
 # Allow event types with dot notation ('.') to define sub-types
 # Events are stored with main type (up to first dot), and then data field
 # is modified to include sub type(s) 
-# https://github.com/square/cube/pull/80
+# https://github.com/square/cube/pull/86
 patch -p0 <<EOF
 diff -ruN cube-0.2.12-orig/lib/cube/event.js cube-0.2.12/lib/cube/event.js
 --- lib.orig/cube/event.js	2013-08-20 11:13:26.000000000 +0930
